@@ -1,31 +1,35 @@
 package com.nuno.kafkalab.orderservice.messaging;
 
+import com.nuno.kafkalab.orderservice.entities.OutboxEvent;
+import com.nuno.kafkalab.orderservice.repositories.OutboxEventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class EventPublisher {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final OutboxEventRepository outboxRepository;
+    private final JsonMapper jsonMapper;
 
-    // Só envia depois do commit da transação atual. Assim:
-    // - se a BD fizer rollback, o evento não sai
-    // - o outro serviço nunca responde a uma encomenda que ainda não está gravada
-    // Ainda pode perder-se o evento se a app morrer entre o commit e o envio
-    // (resolve-se com o padrão "transactional outbox", num passo futuro).
-    // A key (orderId) garante que os eventos da mesma encomenda vão para a mesma partição, por ordem.
-    public void publishAfterCommit(String topic, UUID key, Object event) {
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                kafkaTemplate.send(topic, key.toString(), event);
-            }
-        });
+    // Transactional outbox: em vez de enviar já para o Kafka, grava o evento na tabela outbox_events
+    // NA MESMA transação que a alteração de negócio (ex: a encomenda). Ou ficam os dois gravados, ou nenhum.
+    // O OutboxRelay lê a tabela e envia para o Kafka.
+    // MANDATORY: dá erro se não houver uma transação ativa, porque sem ela o evento deixava de ser atómico
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void publish(String topic, UUID key, String type, Object event) {
+        OutboxEvent outboxEvent = new OutboxEvent();
+        outboxEvent.setTopic(topic);
+        outboxEvent.setMessageKey(key.toString());
+        outboxEvent.setType(type);
+        outboxEvent.setPayload(jsonMapper.writeValueAsString(event));
+        outboxEvent.setCreatedAt(Instant.now());
+        outboxRepository.save(outboxEvent);
     }
 }

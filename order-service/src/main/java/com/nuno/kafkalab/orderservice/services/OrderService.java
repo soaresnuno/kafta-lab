@@ -62,7 +62,7 @@ public class OrderService {
                         .map(item -> new OrderCreatedEvent.Item(item.getProductId(), item.getQuantity()))
                         .toList()
         );
-        eventPublisher.publishAfterCommit(KafkaConfig.ORDER_EVENTS, saved.getId(), event);
+        eventPublisher.publish(KafkaConfig.ORDER_EVENTS, saved.getId(), OrderCreatedEvent.TYPE, event);
 
         return OrderResponse.from(saved);
     }
@@ -81,7 +81,7 @@ public class OrderService {
         }
 
         order.setStatus(OrderStatus.CANCELLED);
-        eventPublisher.publishAfterCommit(KafkaConfig.ORDER_EVENTS, id, new OrderCancelledEvent(id));
+        eventPublisher.publish(KafkaConfig.ORDER_EVENTS, id, OrderCancelledEvent.TYPE, new OrderCancelledEvent(id));
 
         return OrderResponse.from(order);
     }

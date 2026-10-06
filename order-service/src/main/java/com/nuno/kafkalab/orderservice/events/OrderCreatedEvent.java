@@ -9,5 +9,8 @@ public record OrderCreatedEvent(
         UUID orderId,
         List<Item> items
 ) {
+    // Nome lógico que vai no header __TypeId__; o product-service mapeia-o para a sua classe
+    public static final String TYPE = "orderCreated";
+
     public record Item(UUID productId, Integer quantity) {}
 }
