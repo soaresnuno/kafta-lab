@@ -22,6 +22,14 @@ public class Order {
     @Column(nullable = false)
     private UUID userId;
 
+    // STRING guarda "PENDING" na BD em vez do índice (0, 1, ...), que partia se a ordem do enum mudasse
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status = OrderStatus.PENDING;
+
+    // Preenchido só quando o product-service rejeita a encomenda
+    private String rejectionReason;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 

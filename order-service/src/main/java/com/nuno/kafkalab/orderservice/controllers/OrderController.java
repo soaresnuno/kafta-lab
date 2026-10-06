@@ -33,9 +33,9 @@ public class OrderController {
         return orderService.getById(id);
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID id) {
-        orderService.delete(id);
+    // POST em vez de DELETE: a encomenda não desaparece, muda para CANCELLED
+    @PostMapping("/{id}/cancel")
+    public OrderResponse cancel(@PathVariable UUID id) {
+        return orderService.cancel(id);
     }
 }

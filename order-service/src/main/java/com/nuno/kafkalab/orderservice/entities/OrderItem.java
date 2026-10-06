@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -22,6 +23,11 @@ public class OrderItem {
 
     @Column(nullable = false)
     private Integer quantity;
+
+    // Preço no momento da compra, enviado pelo product-service quando confirma o stock.
+    // Fica null enquanto a encomenda está PENDING
+    @Column(precision = 10, scale = 2)
+    private BigDecimal unitPrice;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id")

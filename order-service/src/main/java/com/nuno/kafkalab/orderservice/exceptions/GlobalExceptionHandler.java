@@ -16,4 +16,12 @@ public class GlobalExceptionHandler {
         problem.setTitle("Order not found");
         return problem;
     }
+
+    @ExceptionHandler(InvalidOrderStatusException.class)
+    public ProblemDetail handleInvalidOrderStatus(InvalidOrderStatusException ex) {
+        // 409 Conflict: o pedido é válido, mas não faz sentido no estado atual da encomenda
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Invalid order status");
+        return problem;
+    }
 }
