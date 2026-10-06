@@ -9,5 +9,8 @@ public record StockReservedEvent(
         UUID orderId,
         List<Item> items
 ) {
+    // Nome lógico que vai no header __TypeId__; o order-service mapeia-o para a sua classe
+    public static final String TYPE = "stockReserved";
+
     public record Item(UUID productId, BigDecimal unitPrice) {}
 }

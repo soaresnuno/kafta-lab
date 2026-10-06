@@ -57,7 +57,7 @@ public class StockReservationService {
         if (reason != null) {
             reservation.setStatus(ReservationStatus.REJECTED);
             reservationRepository.save(reservation);
-            eventPublisher.publishAfterCommit(KafkaConfig.STOCK_EVENTS, orderId, new StockRejectedEvent(orderId, reason));
+            eventPublisher.publish(KafkaConfig.STOCK_EVENTS, orderId, StockRejectedEvent.TYPE, new StockRejectedEvent(orderId, reason));
             log.info("Order {} rejected: {}", orderId, reason);
             return;
         }
@@ -72,7 +72,7 @@ public class StockReservationService {
         reservation.setStatus(ReservationStatus.RESERVED);
         reservationRepository.save(reservation);
 
-        eventPublisher.publishAfterCommit(KafkaConfig.STOCK_EVENTS, orderId, new StockReservedEvent(orderId, reservedItems));
+        eventPublisher.publish(KafkaConfig.STOCK_EVENTS, orderId, StockReservedEvent.TYPE, new StockReservedEvent(orderId, reservedItems));
         log.info("Stock reserved for order {}", orderId);
     }
 
