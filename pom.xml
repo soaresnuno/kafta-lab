@@ -96,6 +96,29 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <!-- Cria a propriedade ${org.mockito:mockito-core:jar} com o caminho do jar do Mockito -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Carrega o Mockito como agent da JVM nos testes. Sem isto o Mockito liga-se sozinho
+                 em runtime ("self-attach"), o que as próximas versões do Java vão bloquear -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
