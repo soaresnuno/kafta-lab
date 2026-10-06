@@ -21,11 +21,29 @@
     <!-- Só o que é específico deste serviço.
          web, validation, actuator, lombok e test vêm do parent -->
     <dependencies>
+        <!-- JPA: @Entity, @Id, JpaRepository, ... -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
         <!-- Driver do PostgreSQL para ligar à base de dados -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Kafka: KafkaTemplate para publicar, @KafkaListener para consumir -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-kafka</artifactId>
+        </dependency>
+
+        <!-- Resource server: valida o JWT emitido pelo Keycloak em cada pedido -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
         </dependency>
     </dependencies>
 

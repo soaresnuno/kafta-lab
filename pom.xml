@@ -21,6 +21,7 @@
         <module>order-service</module>
         <module>product-service</module>
         <module>store-service</module>
+        <module>auth-service</module>
     </modules>
 
     <properties>
@@ -41,18 +42,8 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- JPA: @Entity, @Id, JpaRepository, ...
-             Cada filho tem de declarar o seu driver de base de dados -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-        <!-- Kafka: KafkaTemplate para publicar, @KafkaListener para consumir -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-kafka</artifactId>
-        </dependency>
+        <!-- JPA, Kafka e segurança não estão aqui: o auth-service não tem BD nem Kafka.
+             Cada serviço declara os que usa no seu pom -->
 
         <!-- Health checks e métricas: /actuator/health -->
         <dependency>

@@ -1,0 +1,89 @@
+# Corre este ficheiro primeiro: regista os utilizadores e guarda os tokens
+# (aliceToken, bobToken, carolToken) que os outros ficheiros .http usam.
+# Os tokens duram 15 minutos; depois disso volta a correr os logins.
+
+### Registar a alice (vai ter uma loja). Correr outra vez -> 409
+POST http://localhost:8083/auth/register
+Content-Type: application/json
+
+{
+  "email": "alice@kafkalab.dev",
+  "password": "alice-password",
+  "firstName": "Alice",
+  "lastName": "Owner"
+}
+
+### Registar o bob (vai tentar mexer na loja da alice)
+POST http://localhost:8083/auth/register
+Content-Type: application/json
+
+{
+  "email": "bob@kafkalab.dev",
+  "password": "bob-password",
+  "firstName": "Bob",
+  "lastName": "Other"
+}
+
+### Registar a carol (cliente)
+POST http://localhost:8083/auth/register
+Content-Type: application/json
+
+{
+  "email": "carol@kafkalab.dev",
+  "password": "carol-password",
+  "firstName": "Carol",
+  "lastName": "Customer"
+}
+
+### Validação: email inválido e password curta -> 400
+POST http://localhost:8083/auth/register
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "password": "short",
+  "firstName": "X",
+  "lastName": "Y"
+}
+
+### Login da alice (guarda aliceToken)
+POST http://localhost:8083/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@kafkalab.dev",
+  "password": "alice-password"
+}
+
+> {% client.global.set("aliceToken", response.body.accessToken); %}
+
+### Login do bob (guarda bobToken)
+POST http://localhost:8083/auth/login
+Content-Type: application/json
+
+{
+  "email": "bob@kafkalab.dev",
+  "password": "bob-password"
+}
+
+> {% client.global.set("bobToken", response.body.accessToken); %}
+
+### Login da carol (guarda carolToken)
+POST http://localhost:8083/auth/login
+Content-Type: application/json
+
+{
+  "email": "carol@kafkalab.dev",
+  "password": "carol-password"
+}
+
+> {% client.global.set("carolToken", response.body.accessToken); %}
+
+### Password errada -> 401
+POST http://localhost:8083/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@kafkalab.dev",
+  "password": "wrong-password"
+}

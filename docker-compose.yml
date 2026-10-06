@@ -78,7 +78,27 @@ services:
       - kafka
     restart: unless-stopped
 
+  # Servidor de identidade: utilizadores, passwords e emissão de tokens (JWT).
+  # Consola de admin: http://localhost:8180 (admin / admin)
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8
+    container_name: keycloak
+    # start-dev: modo de desenvolvimento (HTTP, BD interna). --import-realm: cria o realm kafka-lab no
+    # primeiro arranque a partir do ficheiro em keycloak/ (se o realm já existir, não faz nada)
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    volumes:
+      # Os utilizadores ficam guardados no volume, tal como os dados do Postgres
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak/kafka-lab-realm.json:/opt/keycloak/data/import/kafka-lab-realm.json:ro
+    restart: unless-stopped
+
 volumes:
   orders_data:
   products_data:
   stores_data:
+  keycloak_data:
