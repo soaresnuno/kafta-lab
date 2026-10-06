@@ -24,4 +24,12 @@ public class GlobalExceptionHandler {
         problem.setTitle("Store inactive");
         return problem;
     }
+
+    @ExceptionHandler(StoreAccessDeniedException.class)
+    public ProblemDetail handleStoreAccessDenied(StoreAccessDeniedException ex) {
+        // 403 Forbidden: sabemos quem és (token válido), mas não podes mexer nesta loja
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problem.setTitle("Access denied");
+        return problem;
+    }
 }

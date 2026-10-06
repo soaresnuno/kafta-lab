@@ -7,6 +7,7 @@ import com.nuno.kafkalab.storeservice.entities.Store;
 import com.nuno.kafkalab.storeservice.entities.StoreStatus;
 import com.nuno.kafkalab.storeservice.events.StoreCreatedEvent;
 import com.nuno.kafkalab.storeservice.events.StoreDeactivatedEvent;
+import com.nuno.kafkalab.storeservice.exceptions.StoreAccessDeniedException;
 import com.nuno.kafkalab.storeservice.exceptions.StoreInactiveException;
 import com.nuno.kafkalab.storeservice.exceptions.StoreNotFoundException;
 import com.nuno.kafkalab.storeservice.messaging.EventPublisher;
@@ -34,26 +35,35 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
+    public List<StoreResponse> getMine(UUID userId) {
+        return storeRepository.findAllByOwnerId(userId).stream()
+                .map(StoreResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public StoreResponse getById(UUID id) {
         return StoreResponse.from(findOrThrow(id));
     }
 
+    // Quem cria a loja fica como dono
     @Transactional
-    public StoreResponse create(CreateStoreRequest request) {
+    public StoreResponse create(CreateStoreRequest request, UUID userId) {
         Store store = new Store();
+        store.setOwnerId(userId);
         store.setName(request.name());
         store.setEmail(request.email());
 
         Store saved = storeRepository.save(store);
         eventPublisher.publish(KafkaConfig.STORE_EVENTS, saved.getId(), StoreCreatedEvent.TYPE,
-                new StoreCreatedEvent(saved.getId(), saved.getName()));
+                new StoreCreatedEvent(saved.getId(), saved.getOwnerId(), saved.getName()));
 
         return StoreResponse.from(saved);
     }
 
     @Transactional
-    public StoreResponse update(UUID id, UpdateStoreRequest request) {
-        Store store = findOrThrow(id);
+    public StoreResponse update(UUID id, UpdateStoreRequest request, UUID userId) {
+        Store store = findOwnedOrThrow(id, userId);
         if (store.getStatus() == StoreStatus.INACTIVE) {
             throw new StoreInactiveException(id);
         }
@@ -66,8 +76,8 @@ public class StoreService {
     // Soft delete: a loja fica INACTIVE e o product-service desativa os produtos dela.
     // Desativar uma loja já inativa não faz nada (o DELETE é idempotente)
     @Transactional
-    public void deactivate(UUID id) {
-        Store store = findOrThrow(id);
+    public void deactivate(UUID id, UUID userId) {
+        Store store = findOwnedOrThrow(id, userId);
         if (store.getStatus() == StoreStatus.INACTIVE) {
             return;
         }
@@ -80,5 +90,14 @@ public class StoreService {
     private Store findOrThrow(UUID id) {
         return storeRepository.findById(id)
                 .orElseThrow(() -> new StoreNotFoundException(id));
+    }
+
+    // 404 se a loja não existe, 403 se existe mas é de outra pessoa
+    private Store findOwnedOrThrow(UUID id, UUID userId) {
+        Store store = findOrThrow(id);
+        if (!store.getOwnerId().equals(userId)) {
+            throw new StoreAccessDeniedException(id);
+        }
+        return store;
     }
 }

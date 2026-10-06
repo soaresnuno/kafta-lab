@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record StoreResponse(
         UUID id,
+        UUID ownerId,
         String name,
         String email,
         StoreStatus status
@@ -14,6 +15,7 @@ public record StoreResponse(
     public static StoreResponse from (Store store) {
         return new StoreResponse(
                 store.getId(),
+                store.getOwnerId(),
                 store.getName(),
                 store.getEmail(),
                 store.getStatus()

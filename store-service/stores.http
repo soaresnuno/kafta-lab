@@ -1,5 +1,17 @@
-### Criar loja (guarda o id em storeId para os pedidos seguintes)
+# Corre primeiro auth-service/auth.http (guarda aliceToken e bobToken)
+
+### Criar loja sem token -> 401
 POST http://localhost:8082/stores
+Content-Type: application/json
+
+{
+  "name": "Keyboard Shop",
+  "email": "hello@keyboardshop.com"
+}
+
+### A alice cria uma loja e fica como dona (guarda o id em storeId)
+POST http://localhost:8082/stores
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -9,14 +21,23 @@ Content-Type: application/json
 
 > {% client.global.set("storeId", response.body.id); %}
 
-### Listar todas
+### Listar todas (público)
 GET http://localhost:8082/stores
 
-### Obter por id
+### Obter por id (público)
 GET http://localhost:8082/stores/{{storeId}}
 
-### Atualizar (PUT substitui os dados da loja)
+### Lojas da alice
+GET http://localhost:8082/stores/mine
+Authorization: Bearer {{aliceToken}}
+
+### Lojas do bob -> lista vazia
+GET http://localhost:8082/stores/mine
+Authorization: Bearer {{bobToken}}
+
+### A alice atualiza a loja (PUT substitui os dados da loja)
 PUT http://localhost:8082/stores/{{storeId}}
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -24,8 +45,23 @@ Content-Type: application/json
   "email": "lisboa@keyboardshop.com"
 }
 
+### O bob tenta atualizar a loja da alice -> 403
+PUT http://localhost:8082/stores/{{storeId}}
+Authorization: Bearer {{bobToken}}
+Content-Type: application/json
+
+{
+  "name": "Hijacked",
+  "email": "bob@kafkalab.dev"
+}
+
+### O bob tenta desativar a loja da alice -> 403
+DELETE http://localhost:8082/stores/{{storeId}}
+Authorization: Bearer {{bobToken}}
+
 ### Validação: nome vazio e email inválido -> 400
 POST http://localhost:8082/stores
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -36,14 +72,16 @@ Content-Type: application/json
 ### Id que não existe -> 404 (ProblemDetail)
 GET http://localhost:8082/stores/00000000-0000-0000-0000-000000000000
 
-### Desativar (soft delete) -> 204; o product-service desativa os produtos desta loja
+### A alice desativa a loja (soft delete) -> 204; o product-service desativa os produtos desta loja
 DELETE http://localhost:8082/stores/{{storeId}}
+Authorization: Bearer {{aliceToken}}
 
 ### Depois de desativar: status INACTIVE
 GET http://localhost:8082/stores/{{storeId}}
 
 ### Editar uma loja inativa -> 409
 PUT http://localhost:8082/stores/{{storeId}}
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {

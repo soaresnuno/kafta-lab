@@ -17,6 +17,10 @@ public class Store {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    // Utilizador que criou a loja (o "sub" do token dele). Só ele a pode editar ou desativar
+    @Column(nullable = false)
+    private UUID ownerId;
+
     @Column(nullable = false)
     private String name;
 
