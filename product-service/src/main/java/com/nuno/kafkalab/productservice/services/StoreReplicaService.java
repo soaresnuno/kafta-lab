@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 // Mantém a cópia local das lojas (StoreReplica) a partir dos eventos de store-events.
 // Os dois métodos são idempotentes: receber o mesmo evento duas vezes dá o mesmo resultado
 @Slf4j
@@ -29,6 +31,7 @@ public class StoreReplicaService {
 
         StoreReplica store = new StoreReplica();
         store.setId(event.storeId());
+        store.setOwnerId(event.ownerId());
         store.setActive(true);
         storeRepository.save(store);
         log.info("Store {} registered", event.storeId());
@@ -36,14 +39,14 @@ public class StoreReplicaService {
 
     @Transactional
     public void deactivate(StoreDeactivatedEvent event) {
-        StoreReplica store = storeRepository.findById(event.storeId())
-                .orElseGet(() -> {
-                    StoreReplica unknown = new StoreReplica();
-                    unknown.setId(event.storeId());
-                    return unknown;
-                });
-        store.setActive(false);
-        storeRepository.save(store);
+        // Os eventos da mesma loja chegam por ordem (mesma key, mesma partição),
+        // por isso uma loja desconhecida aqui não tem produtos para desativar
+        Optional<StoreReplica> found = storeRepository.findById(event.storeId());
+        if (found.isEmpty()) {
+            log.warn("Store {} is unknown, ignoring StoreDeactivated", event.storeId());
+            return;
+        }
+        found.get().setActive(false);
 
         int deactivated = productRepository.deactivateAllByStoreId(event.storeId());
         log.info("Store {} deactivated, {} products deactivated", event.storeId(), deactivated);

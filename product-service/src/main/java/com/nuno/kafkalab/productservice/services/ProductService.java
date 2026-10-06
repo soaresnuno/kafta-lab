@@ -5,6 +5,7 @@ import com.nuno.kafkalab.productservice.dtos.UpdateProductRequest;
 import com.nuno.kafkalab.productservice.entities.Product;
 import com.nuno.kafkalab.productservice.entities.StoreReplica;
 import com.nuno.kafkalab.productservice.exceptions.ProductNotFoundException;
+import com.nuno.kafkalab.productservice.exceptions.StoreAccessDeniedException;
 import com.nuno.kafkalab.productservice.exceptions.StoreInactiveException;
 import com.nuno.kafkalab.productservice.exceptions.StoreNotFoundException;
 import com.nuno.kafkalab.productservice.repositories.ProductRepository;
@@ -40,20 +41,21 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    // Todos os produtos da loja, incluindo os inativos
+    // Todos os produtos da loja, incluindo os inativos. Só para o dono
     @Transactional(readOnly = true)
-    public List<ProductResponse> getByStore(UUID storeId) {
-        if (!storeRepository.existsById(storeId)) {
-            throw new StoreNotFoundException(storeId);
-        }
+    public List<ProductResponse> getByStore(UUID storeId, UUID userId) {
+        requireOwnedStore(storeId, userId);
         return productRepository.findAllByStoreId(storeId).stream()
                 .map(ProductResponse::from)
                 .toList();
     }
 
     @Transactional
-    public ProductResponse create(UUID storeId, CreateProductRequest request) {
-        requireActiveStore(storeId);
+    public ProductResponse create(UUID storeId, CreateProductRequest request, UUID userId) {
+        StoreReplica store = requireOwnedStore(storeId, userId);
+        if (!store.isActive()) {
+            throw new StoreInactiveException(storeId);
+        }
 
         Product product = new Product();
         product.setStoreId(storeId);
@@ -67,7 +69,8 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse update(UUID storeId, UUID productId, UpdateProductRequest request) {
+    public ProductResponse update(UUID storeId, UUID productId, UpdateProductRequest request, UUID userId) {
+        requireOwnedStore(storeId, userId);
         Product product = findStoreProductOrThrow(storeId, productId);
         product.setName(request.name());
         product.setDescription(request.description());
@@ -81,19 +84,22 @@ public class ProductService {
 
     // Soft delete: o produto fica inativo em vez de ser apagado
     @Transactional
-    public void delete(UUID storeId, UUID productId) {
+    public void delete(UUID storeId, UUID productId, UUID userId) {
+        requireOwnedStore(storeId, userId);
         Product product = findStoreProductOrThrow(storeId, productId);
         product.setActive(false);
     }
 
     // A loja vem da cópia local (StoreReplica). Logo a seguir a criar uma loja, o evento
-    // pode ainda não ter chegado e a loja aparece como "not found" durante uns milissegundos
-    private void requireActiveStore(UUID storeId) {
+    // pode ainda não ter chegado e a loja aparece como "not found" durante uns milissegundos.
+    // 404 se a loja não existe, 403 se existe mas é de outra pessoa
+    private StoreReplica requireOwnedStore(UUID storeId, UUID userId) {
         StoreReplica store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreNotFoundException(storeId));
-        if (!store.isActive()) {
-            throw new StoreInactiveException(storeId);
+        if (!store.getOwnerId().equals(userId)) {
+            throw new StoreAccessDeniedException(storeId);
         }
+        return store;
     }
 
     // Um produto de outra loja responde 404, tal como um que não existe

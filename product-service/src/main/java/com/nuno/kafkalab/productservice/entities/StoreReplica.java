@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 // Cópia local das lojas, alimentada pelos eventos de store-events (event-carried state transfer).
-// Permite validar a loja de um produto sem chamar o store-service, mesmo que ele esteja em baixo.
+// Permite validar a loja e o dono de um produto sem chamar o store-service, mesmo que ele esteja em baixo.
 // Guarda só o que este serviço precisa
 @Entity
 @Table(name = "store_replicas")
@@ -22,6 +22,10 @@ public class StoreReplica {
     // O id é o storeId que vem no evento, não é gerado aqui
     @Id
     private UUID id;
+
+    // Dono da loja: só ele pode criar, editar e apagar produtos nela
+    @Column(nullable = false)
+    private UUID ownerId;
 
     @Column(nullable = false)
     private boolean active;

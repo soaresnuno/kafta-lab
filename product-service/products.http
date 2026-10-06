@@ -1,5 +1,8 @@
-### 1. Criar uma loja no store-service (guarda o id em storeId)
+# Corre primeiro auth-service/auth.http (guarda aliceToken e bobToken)
+
+### 1. A alice cria uma loja no store-service (guarda o id em storeId)
 POST http://localhost:8082/stores
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -9,9 +12,10 @@ Content-Type: application/json
 
 > {% client.global.set("storeId", response.body.id); %}
 
-### 2. Criar produto na loja (guarda o id em productId)
+### 2. A alice cria um produto na loja (guarda o id em productId)
 # Se der 404 "Store not found", o evento storeCreated ainda não chegou: repete daqui a um instante
 POST http://localhost:8081/stores/{{storeId}}/products
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -23,17 +27,44 @@ Content-Type: application/json
 
 > {% client.global.set("productId", response.body.id); %}
 
-### Catálogo público (só produtos ativos)
+### O bob tenta criar um produto na loja da alice -> 403
+POST http://localhost:8081/stores/{{storeId}}/products
+Authorization: Bearer {{bobToken}}
+Content-Type: application/json
+
+{
+  "name": "Fake product",
+  "price": 1,
+  "stock": 1
+}
+
+### Criar produto sem token -> 401
+POST http://localhost:8081/stores/{{storeId}}/products
+Content-Type: application/json
+
+{
+  "name": "No token",
+  "price": 1,
+  "stock": 1
+}
+
+### Catálogo público (só produtos ativos, sem token)
 GET http://localhost:8081/products
 
-### Obter por id
+### Obter por id (público)
 GET http://localhost:8081/products/{{productId}}
 
-### Produtos da loja (inclui inativos)
+### Produtos da loja (inclui inativos), só para a dona
 GET http://localhost:8081/stores/{{storeId}}/products
+Authorization: Bearer {{aliceToken}}
 
-### Atualizar (PUT substitui o produto inteiro)
+### O bob tenta ver a gestão de produtos da loja da alice -> 403
+GET http://localhost:8081/stores/{{storeId}}/products
+Authorization: Bearer {{bobToken}}
+
+### A alice atualiza o produto (PUT substitui o produto inteiro)
 PUT http://localhost:8081/stores/{{storeId}}/products/{{productId}}
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -43,8 +74,9 @@ Content-Type: application/json
   "stock": 10
 }
 
-### Atualizar através de outra loja -> 404
-PUT http://localhost:8081/stores/00000000-0000-0000-0000-000000000000/products/{{productId}}
+### O bob tenta atualizar o produto da alice -> 403
+PUT http://localhost:8081/stores/{{storeId}}/products/{{productId}}
+Authorization: Bearer {{bobToken}}
 Content-Type: application/json
 
 {
@@ -55,6 +87,7 @@ Content-Type: application/json
 
 ### Validação: nome vazio e preço negativo -> 400
 POST http://localhost:8081/stores/{{storeId}}/products
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -65,6 +98,7 @@ Content-Type: application/json
 
 ### Criar produto numa loja que não existe -> 404
 POST http://localhost:8081/stores/00000000-0000-0000-0000-000000000000/products
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -76,8 +110,9 @@ Content-Type: application/json
 ### Id que não existe -> 404 (ProblemDetail)
 GET http://localhost:8081/products/00000000-0000-0000-0000-000000000000
 
-### Apagar (soft delete) -> 204
+### A alice apaga o produto (soft delete) -> 204
 DELETE http://localhost:8081/stores/{{storeId}}/products/{{productId}}
+Authorization: Bearer {{aliceToken}}
 
 ### Depois de apagar: continua visível por id, com active=false, mas sai do catálogo
 GET http://localhost:8081/products/{{productId}}
