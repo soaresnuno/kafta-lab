@@ -1,7 +1,5 @@
-package com.nuno.kafkalab.orderservice.messaging;
+package com.nuno.kafkalab.outbox;
 
-import com.nuno.kafkalab.orderservice.entities.OutboxEvent;
-import com.nuno.kafkalab.orderservice.repositories.OutboxEventRepository;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

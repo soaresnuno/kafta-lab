@@ -1,7 +1,5 @@
-package com.nuno.kafkalab.orderservice.repositories;
+package com.nuno.kafkalab.outbox;
 
-import com.nuno.kafkalab.orderservice.PostgresContainerConfiguration;
-import com.nuno.kafkalab.orderservice.entities.OutboxEvent;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,9 @@ import java.util.UUID;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+// O módulo não tem application.properties (uma biblioteca não deve ter: ia misturar-se com o do serviço),
+// por isso o teste diz ao Hibernate para criar a tabela
+@DataJpaTest(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(PostgresContainerConfiguration.class)
 class OutboxEventRepositoryTest {

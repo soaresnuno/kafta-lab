@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-// Liga os @Scheduled (o OutboxRelay corre de 500 em 500ms)
+// Liga os @Scheduled deste serviço (UnpaidOrdersJob). O do outbox é ligado pelo próprio módulo
 @EnableScheduling
 public class OrderServiceApplication {
 

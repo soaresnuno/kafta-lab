@@ -1,5 +1,6 @@
 package com.nuno.kafkalab.productservice.services;
 
+import com.nuno.kafkalab.outbox.EventPublisher;
 import com.nuno.kafkalab.productservice.config.KafkaConfig;
 import com.nuno.kafkalab.productservice.entities.Product;
 import com.nuno.kafkalab.productservice.entities.ReservationStatus;
@@ -9,7 +10,6 @@ import com.nuno.kafkalab.productservice.events.OrderCancelledEvent;
 import com.nuno.kafkalab.productservice.events.OrderCreatedEvent;
 import com.nuno.kafkalab.productservice.events.StockRejectedEvent;
 import com.nuno.kafkalab.productservice.events.StockReservedEvent;
-import com.nuno.kafkalab.productservice.messaging.EventPublisher;
 import com.nuno.kafkalab.productservice.repositories.ProductRepository;
 import com.nuno.kafkalab.productservice.repositories.StockReservationRepository;
 import lombok.RequiredArgsConstructor;

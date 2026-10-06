@@ -1,5 +1,6 @@
 package com.nuno.kafkalab.paymentservice.services;
 
+import com.nuno.kafkalab.outbox.EventPublisher;
 import com.nuno.kafkalab.paymentservice.config.KafkaConfig;
 import com.nuno.kafkalab.paymentservice.entities.Payment;
 import com.nuno.kafkalab.paymentservice.entities.PaymentStatus;
@@ -12,7 +13,6 @@ import com.nuno.kafkalab.paymentservice.gateway.PaymentGateway;
 import com.nuno.kafkalab.paymentservice.gateway.PaymentGateways;
 import com.nuno.kafkalab.paymentservice.gateway.ProviderPayment;
 import com.nuno.kafkalab.paymentservice.gateway.ProviderUpdate;
-import com.nuno.kafkalab.paymentservice.messaging.EventPublisher;
 import com.nuno.kafkalab.paymentservice.repositories.PaymentRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

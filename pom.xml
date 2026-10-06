@@ -18,6 +18,8 @@
     <packaging>pom</packaging>
 
     <modules>
+        <!-- Biblioteca partilhada; o Maven compila-a antes dos serviços que dependem dela -->
+        <module>outbox</module>
         <module>order-service</module>
         <module>product-service</module>
         <module>store-service</module>
@@ -82,8 +84,14 @@
         </dependency>
     </dependencies>
 
+    <!-- Versões das nossas bibliotecas: os serviços declaram a dependência sem versão -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.nuno.kafkalab</groupId>
+                <artifactId>outbox</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

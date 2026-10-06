@@ -1,6 +1,5 @@
-package com.nuno.kafkalab.paymentservice.repositories;
+package com.nuno.kafkalab.outbox;
 
-import com.nuno.kafkalab.paymentservice.entities.OutboxEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

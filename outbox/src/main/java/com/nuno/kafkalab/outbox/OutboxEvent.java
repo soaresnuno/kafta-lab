@@ -1,4 +1,4 @@
-package com.nuno.kafkalab.storeservice.entities;
+package com.nuno.kafkalab.outbox;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -8,7 +8,8 @@ import lombok.Setter;
 import java.time.Instant;
 
 // Um evento à espera de ser enviado para o Kafka (transactional outbox).
-// É gravado na mesma transação que a alteração da loja; o OutboxRelay envia-o depois
+// É gravado na mesma transação que a alteração de negócio; o OutboxRelay envia-o depois.
+// Cada serviço tem a sua tabela outbox_events, na sua própria base de dados: partilha-se o código, não os dados
 @Entity
 @Table(name = "outbox_events")
 @Getter
@@ -23,11 +24,11 @@ public class OutboxEvent {
     @Column(nullable = false)
     private String topic;
 
-    // Key da mensagem Kafka (o orderId): decide a partição
+    // Key da mensagem Kafka (ex: o orderId): decide a partição
     @Column(nullable = false)
     private String messageKey;
 
-    // Nome lógico do evento (ex: storeCreated), vai no header __TypeId__
+    // Nome lógico do evento (ex: orderCreated), vai no header __TypeId__
     @Column(nullable = false)
     private String type;
 

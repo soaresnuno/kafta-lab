@@ -14,52 +14,37 @@
     </parent>
 
     <!-- groupId e version são herdados do parent -->
-    <artifactId>store-service</artifactId>
-    <name>store-service</name>
-    <description>Stores service</description>
+    <artifactId>outbox</artifactId>
+    <name>outbox</name>
+    <description>Transactional outbox shared by the services: saves events with the business data and relays them to Kafka</description>
 
-    <!-- Só o que é específico deste serviço.
-         web, validation, actuator, lombok e test vêm do parent -->
+    <!-- Biblioteca partilhada, não é uma aplicação: não tem spring-boot-maven-plugin nem application.properties.
+         Basta um serviço declarar esta dependência para o outbox ficar ativo (ver OutboxAutoConfiguration) -->
     <dependencies>
-        <!-- JPA: @Entity, @Id, JpaRepository, ... -->
+        <!-- OutboxEvent e OutboxEventRepository -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Driver do PostgreSQL para ligar à base de dados -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- Kafka: KafkaTemplate para publicar, @KafkaListener para consumir -->
+        <!-- O OutboxRelay envia com o KafkaTemplate -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-kafka</artifactId>
         </dependency>
 
-        <!-- Transactional outbox partilhado (módulo outbox): EventPublisher e OutboxRelay -->
-        <dependency>
-            <groupId>com.nuno.kafkalab</groupId>
-            <artifactId>outbox</artifactId>
-        </dependency>
-
-        <!-- Resource server: valida o JWT emitido pelo Keycloak em cada pedido -->
+        <!-- O EventPublisher converte os eventos para JSON com o JsonMapper -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+            <artifactId>spring-boot-starter-jackson</artifactId>
         </dependency>
 
-        <!-- Testes com segurança: jwt() simula um utilizador autenticado sem precisar do Keycloak -->
+        <!-- Testes do repositório contra um Postgres real num contentor -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security-test</artifactId>
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- Testcontainers: Postgres e Kafka reais em contentores Docker, só durante os testes -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-testcontainers</artifactId>
@@ -71,19 +56,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>testcontainers-kafka</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <!-- Gera o .jar executável; tem de estar no filho -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

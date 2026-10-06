@@ -1,5 +1,6 @@
 package com.nuno.kafkalab.storeservice.services;
 
+import com.nuno.kafkalab.outbox.EventPublisher;
 import com.nuno.kafkalab.storeservice.config.KafkaConfig;
 import com.nuno.kafkalab.storeservice.dtos.CreateStoreRequest;
 import com.nuno.kafkalab.storeservice.dtos.UpdateStoreRequest;
@@ -10,7 +11,6 @@ import com.nuno.kafkalab.storeservice.events.StoreDeactivatedEvent;
 import com.nuno.kafkalab.storeservice.exceptions.StoreAccessDeniedException;
 import com.nuno.kafkalab.storeservice.exceptions.StoreInactiveException;
 import com.nuno.kafkalab.storeservice.exceptions.StoreNotFoundException;
-import com.nuno.kafkalab.storeservice.messaging.EventPublisher;
 import com.nuno.kafkalab.storeservice.repositories.StoreRepository;
 import com.nuno.kafkalab.storeservice.responses.StoreResponse;
 import org.junit.jupiter.api.Test;

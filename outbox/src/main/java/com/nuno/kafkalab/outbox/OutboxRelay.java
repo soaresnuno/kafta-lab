@@ -1,13 +1,10 @@
-package com.nuno.kafkalab.productservice.messaging;
+package com.nuno.kafkalab.outbox;
 
-import com.nuno.kafkalab.productservice.entities.OutboxEvent;
-import com.nuno.kafkalab.productservice.repositories.OutboxEventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
@@ -15,9 +12,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
-// Envia para o Kafka os eventos gravados na tabela outbox_events (polling publisher)
+// Envia para o Kafka os eventos gravados na tabela outbox_events (polling publisher).
+// Registado pela OutboxAutoConfiguration, que também liga o @Scheduled
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class OutboxRelay {
 

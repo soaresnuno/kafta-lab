@@ -40,6 +40,12 @@
             <artifactId>spring-boot-starter-kafka</artifactId>
         </dependency>
 
+        <!-- Transactional outbox partilhado (módulo outbox): EventPublisher e OutboxRelay -->
+        <dependency>
+            <groupId>com.nuno.kafkalab</groupId>
+            <artifactId>outbox</artifactId>
+        </dependency>
+
         <!-- Resource server: valida o JWT emitido pelo Keycloak em cada pedido -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
