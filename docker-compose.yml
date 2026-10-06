@@ -38,6 +38,19 @@ services:
       - stores_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  payments-db:
+    image: postgres:15-alpine
+    container_name: payments-postgres
+    environment:
+      POSTGRES_DB: payments_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpassword
+    ports:
+      - "5435:5432"
+    volumes:
+      - payments_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   # Kafka em modo KRaft (sem Zookeeper): um único nó que é broker e controller ao mesmo tempo
   kafka:
     image: apache/kafka:4.1.1
@@ -101,4 +114,5 @@ volumes:
   orders_data:
   products_data:
   stores_data:
+  payments_data:
   keycloak_data:

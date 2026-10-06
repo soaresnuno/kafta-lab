@@ -1,0 +1,42 @@
+# Corre primeiro auth-service/auth.http (tokens) e order-service/orders.http até ao passo 2 (guarda orderId).
+# O fornecedor "fake" simula um fornecedor real (ex: Stripe): o pagamento fica PENDING com um checkoutUrl,
+# o cliente paga nessa página e o fornecedor avisa o payment-service por webhook assinado.
+
+### Ver o pagamento da encomenda: PENDING e o checkoutUrl onde pagar (guarda o checkoutUrl)
+GET http://localhost:8084/payments/orders/{{orderId}}
+Authorization: Bearer {{carolToken}}
+
+> {% client.global.set("checkoutUrl", response.body.checkoutUrl); %}
+
+### Pagar na "página" do fornecedor -> 202. O fornecedor envia o webhook e a encomenda passa a CONFIRMED
+POST {{checkoutUrl}}/pay
+
+### Ou recusar (cartão recusado) -> a encomenda passa a PAYMENT_FAILED e o stock volta
+POST {{checkoutUrl}}/decline
+
+### Ver o pagamento outra vez (SUCCEEDED ou FAILED)
+GET http://localhost:8084/payments/orders/{{orderId}}
+Authorization: Bearer {{carolToken}}
+
+### O bob tenta ver o pagamento da carol -> 404
+GET http://localhost:8084/payments/orders/{{orderId}}
+Authorization: Bearer {{bobToken}}
+
+### Sem token -> 401
+GET http://localhost:8084/payments/orders/{{orderId}}
+
+### Webhook forjado (assinatura errada) -> 400: ninguém consegue marcar um pagamento como pago sem o segredo
+POST http://localhost:8084/payments/webhooks/fake
+Content-Type: application/json
+Fake-Signature: not-a-valid-signature
+
+{"type": "payment.succeeded", "paymentId": "fake_forged"}
+
+### Webhook de um fornecedor que não existe -> 404
+POST http://localhost:8084/payments/webhooks/unknown-provider
+Content-Type: application/json
+
+{}
+
+### Health check
+GET http://localhost:8084/actuator/health
