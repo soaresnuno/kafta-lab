@@ -5,14 +5,18 @@ import com.nuno.kafkalab.orderservice.dtos.CreateOrderRequest;
 import com.nuno.kafkalab.orderservice.entities.Order;
 import com.nuno.kafkalab.orderservice.entities.OrderItem;
 import com.nuno.kafkalab.orderservice.entities.OrderStatus;
+import com.nuno.kafkalab.orderservice.entities.StoreReplica;
 import com.nuno.kafkalab.orderservice.events.OrderCancelledEvent;
 import com.nuno.kafkalab.orderservice.events.OrderCreatedEvent;
 import com.nuno.kafkalab.orderservice.events.StockRejectedEvent;
 import com.nuno.kafkalab.orderservice.events.StockReservedEvent;
 import com.nuno.kafkalab.orderservice.exceptions.InvalidOrderStatusException;
 import com.nuno.kafkalab.orderservice.exceptions.OrderNotFoundException;
+import com.nuno.kafkalab.orderservice.exceptions.StoreAccessDeniedException;
+import com.nuno.kafkalab.orderservice.exceptions.StoreNotFoundException;
 import com.nuno.kafkalab.orderservice.messaging.EventPublisher;
 import com.nuno.kafkalab.orderservice.repositories.OrderRepository;
+import com.nuno.kafkalab.orderservice.repositories.StoreReplicaRepository;
 import com.nuno.kafkalab.orderservice.responses.OrderResponse;
 import com.nuno.kafkalab.orderservice.responses.StoreOrderResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,19 +37,21 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final StoreReplicaRepository storeRepository;
     private final EventPublisher eventPublisher;
 
+    // Só as encomendas do próprio utilizador
     @Transactional(readOnly = true)
-    public List<OrderResponse> getAll() {
-        return orderRepository.findAll().stream()
+    public List<OrderResponse> getMine(UUID userId) {
+        return orderRepository.findAllByUserId(userId).stream()
                 .map(OrderResponse::from)
                 .toList();
     }
 
     @Transactional
-    public OrderResponse create(CreateOrderRequest request) {
+    public OrderResponse create(CreateOrderRequest request, UUID userId) {
         Order order = new Order();
-        order.setUserId(request.userId());
+        order.setUserId(userId);
 
         for (var itemRequest : request.items()) {
             OrderItem item = new OrderItem();
@@ -69,13 +75,19 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderResponse getById(UUID id) {
-        return OrderResponse.from(findOrThrow(id));
+    public OrderResponse getById(UUID id, UUID userId) {
+        return OrderResponse.from(findOwnOrThrow(id, userId));
     }
 
-    // Encomendas com items desta loja. Cada loja só vê os seus items
+    // Encomendas com items desta loja, só para o dono da loja. Cada loja só vê os seus items
     @Transactional(readOnly = true)
-    public List<StoreOrderResponse> getByStore(UUID storeId) {
+    public List<StoreOrderResponse> getByStore(UUID storeId, UUID userId) {
+        StoreReplica store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreNotFoundException(storeId));
+        if (!store.getOwnerId().equals(userId)) {
+            throw new StoreAccessDeniedException(storeId);
+        }
+
         return orderRepository.findAllByStoreId(storeId).stream()
                 .map(order -> StoreOrderResponse.from(order, storeId))
                 .toList();
@@ -83,8 +95,8 @@ public class OrderService {
 
     // Em vez de apagar, cancela: fica o histórico e o product-service devolve o stock
     @Transactional
-    public OrderResponse cancel(UUID id) {
-        Order order = findOrThrow(id);
+    public OrderResponse cancel(UUID id, UUID userId) {
+        Order order = findOwnOrThrow(id, userId);
         if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
             throw new InvalidOrderStatusException(id, order.getStatus());
         }
@@ -138,8 +150,9 @@ public class OrderService {
         return order;
     }
 
-    private Order findOrThrow(UUID id) {
-        return orderRepository.findById(id)
+    // A encomenda de outra pessoa responde 404, tal como uma que não existe: não revela que existe
+    private Order findOwnOrThrow(UUID id, UUID userId) {
+        return orderRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new OrderNotFoundException(id));
     }
 }

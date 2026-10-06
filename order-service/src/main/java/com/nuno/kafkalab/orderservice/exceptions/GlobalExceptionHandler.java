@@ -24,4 +24,19 @@ public class GlobalExceptionHandler {
         problem.setTitle("Invalid order status");
         return problem;
     }
+
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ProblemDetail handleStoreNotFound(StoreNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Store not found");
+        return problem;
+    }
+
+    @ExceptionHandler(StoreAccessDeniedException.class)
+    public ProblemDetail handleStoreAccessDenied(StoreAccessDeniedException ex) {
+        // 403 Forbidden: sabemos quem és (token válido), mas não és o dono desta loja
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problem.setTitle("Access denied");
+        return problem;
+    }
 }

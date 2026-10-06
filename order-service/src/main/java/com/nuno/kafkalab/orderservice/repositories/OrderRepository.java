@@ -8,13 +8,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @NullMarked
 public interface OrderRepository extends JpaRepository<Order, UUID> {
-    @Override
     @EntityGraph(attributePaths = "items")
-    List<Order> findAll();
+    List<Order> findAllByUserId(UUID userId);
+
+    Optional<Order> findByIdAndUserId(UUID id, UUID userId);
 
     // O "exists" filtra as encomendas; o @EntityGraph carrega TODOS os items de cada uma
     // (um "join ... where" no fetch traria só os items filtrados para dentro da entidade)

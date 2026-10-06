@@ -1,5 +1,9 @@
-### 0. Criar uma loja no store-service (guarda o id em storeId)
+# Corre primeiro auth-service/auth.http (guarda aliceToken, bobToken e carolToken)
+# A alice é dona da loja, a carol é cliente, o bob é outra pessoa qualquer.
+
+### 0. A alice cria uma loja no store-service (guarda o id em storeId)
 POST http://localhost:8082/stores
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -9,9 +13,10 @@ Content-Type: application/json
 
 > {% client.global.set("storeId", response.body.id); %}
 
-### 1. Criar um produto da loja com stock 5 (guarda o id em productId)
+### 1. A alice cria um produto com stock 5 (guarda o id em productId)
 # Se der 404 "Store not found", o evento storeCreated ainda não chegou: repete daqui a um instante
 POST http://localhost:8081/stores/{{storeId}}/products
+Authorization: Bearer {{aliceToken}}
 Content-Type: application/json
 
 {
@@ -23,12 +28,23 @@ Content-Type: application/json
 
 > {% client.global.set("productId", response.body.id); %}
 
-### 2. Encomendar 2 unidades -> 201 com status PENDING (guarda o id em orderId)
+### Encomendar sem token -> 401
 POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
-  "userId": "11111111-1111-1111-1111-111111111111",
+  "items": [
+    { "productId": "{{productId}}", "quantity": 1 }
+  ]
+}
+
+### 2. A carol encomenda 2 unidades -> 201 com status PENDING (guarda o id em orderId)
+# O userId não vai no body: é o da carol, tirado do token
+POST http://localhost:8080/orders
+Authorization: Bearer {{carolToken}}
+Content-Type: application/json
+
+{
   "items": [
     { "productId": "{{productId}}", "quantity": 2 }
   ]
@@ -38,19 +54,29 @@ Content-Type: application/json
 
 ### 2b. Um instante depois -> CONFIRMED, com storeId, unitPrice e total
 GET http://localhost:8080/orders/{{orderId}}
+Authorization: Bearer {{carolToken}}
 
-### 2c. A loja vê a encomenda (só os seus items)
+### 2c. A alice (dona da loja) vê a encomenda da carol (só os items da loja dela)
 GET http://localhost:8080/stores/{{storeId}}/orders
+Authorization: Bearer {{aliceToken}}
+
+### 2d. O bob tenta ver as encomendas da loja da alice -> 403
+GET http://localhost:8080/stores/{{storeId}}/orders
+Authorization: Bearer {{bobToken}}
+
+### 2e. O bob tenta ver a encomenda da carol -> 404 (não revela que existe)
+GET http://localhost:8080/orders/{{orderId}}
+Authorization: Bearer {{bobToken}}
 
 ### 3. O stock do produto desceu para 3
 GET http://localhost:8081/products/{{productId}}
 
-### 4. Encomendar 10 unidades -> fica REJECTED (stock insuficiente)
+### 4. A carol encomenda 10 unidades -> fica REJECTED (stock insuficiente)
 POST http://localhost:8080/orders
+Authorization: Bearer {{carolToken}}
 Content-Type: application/json
 
 {
-  "userId": "11111111-1111-1111-1111-111111111111",
   "items": [
     { "productId": "{{productId}}", "quantity": 10 }
   ]
@@ -60,13 +86,14 @@ Content-Type: application/json
 
 ### 4b. Ver o motivo da rejeição
 GET http://localhost:8080/orders/{{rejectedOrderId}}
+Authorization: Bearer {{carolToken}}
 
 ### 5. Encomendar um produto que não existe -> fica REJECTED (produto não encontrado)
 POST http://localhost:8080/orders
+Authorization: Bearer {{carolToken}}
 Content-Type: application/json
 
 {
-  "userId": "11111111-1111-1111-1111-111111111111",
   "items": [
     { "productId": "22222222-2222-2222-2222-222222222222", "quantity": 1 }
   ]
@@ -76,21 +103,34 @@ Content-Type: application/json
 
 ### 5b. Ver o motivo da rejeição
 GET http://localhost:8080/orders/{{unknownProductOrderId}}
+Authorization: Bearer {{carolToken}}
 
-### 6. Cancelar a encomenda confirmada -> CANCELLED
+### 6. O bob tenta cancelar a encomenda da carol -> 404
 POST http://localhost:8080/orders/{{orderId}}/cancel
+Authorization: Bearer {{bobToken}}
 
-### 6b. O stock do produto voltou a 5
+### 6b. A carol cancela a encomenda confirmada -> CANCELLED
+POST http://localhost:8080/orders/{{orderId}}/cancel
+Authorization: Bearer {{carolToken}}
+
+### 6c. O stock do produto voltou a 5
 GET http://localhost:8081/products/{{productId}}
 
 ### 7. Cancelar outra vez -> 409 (ProblemDetail)
 POST http://localhost:8080/orders/{{orderId}}/cancel
+Authorization: Bearer {{carolToken}}
 
-### Listar todas
+### As minhas encomendas (carol)
 GET http://localhost:8080/orders
+Authorization: Bearer {{carolToken}}
 
-### Validação: sem userId e lista de items vazia -> 400
+### As minhas encomendas (bob) -> lista vazia
+GET http://localhost:8080/orders
+Authorization: Bearer {{bobToken}}
+
+### Validação: lista de items vazia -> 400
 POST http://localhost:8080/orders
+Authorization: Bearer {{carolToken}}
 Content-Type: application/json
 
 {
@@ -99,10 +139,10 @@ Content-Type: application/json
 
 ### Validação: quantidade 0 num item -> 400
 POST http://localhost:8080/orders
+Authorization: Bearer {{carolToken}}
 Content-Type: application/json
 
 {
-  "userId": "11111111-1111-1111-1111-111111111111",
   "items": [
     { "productId": "22222222-2222-2222-2222-222222222222", "quantity": 0 }
   ]
@@ -110,6 +150,7 @@ Content-Type: application/json
 
 ### Id que não existe -> 404 (ProblemDetail)
 GET http://localhost:8080/orders/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{carolToken}}
 
 ### Health check
 GET http://localhost:8080/actuator/health
