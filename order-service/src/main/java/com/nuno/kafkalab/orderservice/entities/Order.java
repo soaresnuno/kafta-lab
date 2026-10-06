@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,8 +29,11 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status = OrderStatus.PENDING;
 
-    // Preenchido só quando o product-service rejeita a encomenda
+    // Motivo quando a encomenda não avança: sem stock, pagamento recusado ou pagamento fora do prazo
     private String rejectionReason;
+
+    // Quando ficou à espera de pagamento. Serve para cancelar as que ficam por pagar demasiado tempo
+    private Instant awaitingPaymentSince;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
@@ -38,5 +43,20 @@ public class Order {
     public void addItem(OrderItem item) {
         items.add(item);
         item.setOrder(this);
+    }
+
+    public BigDecimal getTotal() {
+        return totalOf(items);
+    }
+
+    // Soma de preço × quantidade. É null enquanto algum item não tem preço,
+    // ou seja, antes de o product-service reservar o stock e dizer os preços
+    public static BigDecimal totalOf(List<OrderItem> items) {
+        if (items.stream().anyMatch(item -> item.getUnitPrice() == null)) {
+            return null;
+        }
+        return items.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

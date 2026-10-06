@@ -26,7 +26,7 @@ public record StoreOrderResponse(
                 order.getId(),
                 order.getUserId(),
                 order.getStatus(),
-                OrderResponse.totalOf(storeItems),
+                Order.totalOf(storeItems),
                 storeItems.stream().map(OrderItemResponse::from).toList()
         );
     }

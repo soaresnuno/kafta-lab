@@ -1,8 +1,8 @@
 package com.nuno.kafkalab.orderservice.messaging;
 
 import com.nuno.kafkalab.orderservice.config.KafkaConfig;
-import com.nuno.kafkalab.orderservice.events.StockRejectedEvent;
-import com.nuno.kafkalab.orderservice.events.StockReservedEvent;
+import com.nuno.kafkalab.orderservice.events.PaymentFailedEvent;
+import com.nuno.kafkalab.orderservice.events.PaymentSucceededEvent;
 import com.nuno.kafkalab.orderservice.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaHandler;
@@ -13,18 +13,18 @@ import org.springframework.stereotype.Component;
 // e o Spring chama o @KafkaHandler cujo parâmetro tem esse tipo
 @Component
 @RequiredArgsConstructor
-@KafkaListener(topics = KafkaConfig.STOCK_EVENTS)
-public class StockEventsListener {
+@KafkaListener(topics = KafkaConfig.PAYMENT_EVENTS)
+public class PaymentEventsListener {
 
     private final OrderService orderService;
 
     @KafkaHandler
-    public void onStockReserved(StockReservedEvent event) {
-        orderService.stockReserved(event);
+    public void onPaymentSucceeded(PaymentSucceededEvent event) {
+        orderService.paymentSucceeded(event);
     }
 
     @KafkaHandler
-    public void onStockRejected(StockRejectedEvent event) {
-        orderService.stockRejected(event);
+    public void onPaymentFailed(PaymentFailedEvent event) {
+        orderService.paymentFailed(event);
     }
 }

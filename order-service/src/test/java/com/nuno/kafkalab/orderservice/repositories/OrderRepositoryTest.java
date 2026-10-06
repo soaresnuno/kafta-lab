@@ -12,6 +12,8 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,6 +61,27 @@ class OrderRepositoryTest {
                 .containsExactly(carolOrder.getId());
         assertThat(orderRepository.findByIdAndUserId(carolOrder.getId(), CAROL)).isPresent();
         assertThat(orderRepository.findByIdAndUserId(carolOrder.getId(), BOB)).isEmpty();
+    }
+
+    @Test
+    void unpaidQueryFindsOnlyOrdersWaitingSinceBeforeTheCutoff() {
+        Instant cutoff = Instant.now().minus(15, ChronoUnit.MINUTES);
+        Order expired = save(awaitingPaymentSince(cutoff.minus(5, ChronoUnit.MINUTES)));
+        save(awaitingPaymentSince(cutoff.plus(5, ChronoUnit.MINUTES)));
+        Order paid = order(CAROL, item(STORE_A));
+        paid.setAwaitingPaymentSince(cutoff.minus(5, ChronoUnit.MINUTES));
+        save(paid);
+
+        assertThat(orderRepository.findAllByStatusAndAwaitingPaymentSinceBefore(OrderStatus.AWAITING_PAYMENT, cutoff))
+                .extracting(Order::getId)
+                .containsExactly(expired.getId());
+    }
+
+    private static Order awaitingPaymentSince(Instant since) {
+        Order order = order(CAROL, item(STORE_A));
+        order.setStatus(OrderStatus.AWAITING_PAYMENT);
+        order.setAwaitingPaymentSince(since);
+        return order;
     }
 
     private Order save(Order order) {

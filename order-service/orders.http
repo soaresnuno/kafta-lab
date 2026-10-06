@@ -1,5 +1,7 @@
 # Corre primeiro auth-service/auth.http (guarda aliceToken, bobToken e carolToken)
 # A alice é dona da loja, a carol é cliente, o bob é outra pessoa qualquer.
+# Fluxo: encomenda -> stock reservado (AWAITING_PAYMENT) -> pagamento -> CONFIRMED.
+# Encomendas por pagar há mais de 15 minutos são canceladas automaticamente.
 
 ### 0. A alice cria uma loja no store-service (guarda o id em storeId)
 POST http://localhost:8082/stores
@@ -52,19 +54,32 @@ Content-Type: application/json
 
 > {% client.global.set("orderId", response.body.id); %}
 
-### 2b. Um instante depois -> CONFIRMED, com storeId, unitPrice e total
+### 2b. Um instante depois -> AWAITING_PAYMENT, com storeId, unitPrice e total (stock reservado)
 GET http://localhost:8080/orders/{{orderId}}
 Authorization: Bearer {{carolToken}}
 
-### 2c. A alice (dona da loja) vê a encomenda da carol (só os items da loja dela)
+### 2c. O pagamento da encomenda: PENDING, com o checkoutUrl onde pagar (guarda o checkoutUrl)
+GET http://localhost:8084/payments/orders/{{orderId}}
+Authorization: Bearer {{carolToken}}
+
+> {% client.global.set("checkoutUrl", response.body.checkoutUrl); %}
+
+### 2d. A carol paga na "página" do fornecedor -> 202 (para recusar, usa /decline em vez de /pay)
+POST {{checkoutUrl}}/pay
+
+### 2e. Um instante depois -> CONFIRMED (paga)
+GET http://localhost:8080/orders/{{orderId}}
+Authorization: Bearer {{carolToken}}
+
+### 2f. A alice (dona da loja) vê a encomenda da carol (só os items da loja dela)
 GET http://localhost:8080/stores/{{storeId}}/orders
 Authorization: Bearer {{aliceToken}}
 
-### 2d. O bob tenta ver as encomendas da loja da alice -> 403
+### 2g. O bob tenta ver as encomendas da loja da alice -> 403
 GET http://localhost:8080/stores/{{storeId}}/orders
 Authorization: Bearer {{bobToken}}
 
-### 2e. O bob tenta ver a encomenda da carol -> 404 (não revela que existe)
+### 2h. O bob tenta ver a encomenda da carol -> 404 (não revela que existe)
 GET http://localhost:8080/orders/{{orderId}}
 Authorization: Bearer {{bobToken}}
 
@@ -109,7 +124,7 @@ Authorization: Bearer {{carolToken}}
 POST http://localhost:8080/orders/{{orderId}}/cancel
 Authorization: Bearer {{bobToken}}
 
-### 6b. A carol cancela a encomenda confirmada -> CANCELLED
+### 6b. A carol cancela a encomenda paga -> CANCELLED; o pagamento é reembolsado (REFUNDED)
 POST http://localhost:8080/orders/{{orderId}}/cancel
 Authorization: Bearer {{carolToken}}
 

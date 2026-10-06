@@ -1,12 +1,14 @@
 package com.nuno.kafkalab.orderservice.repositories;
 
 import com.nuno.kafkalab.orderservice.entities.Order;
+import com.nuno.kafkalab.orderservice.entities.OrderStatus;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,4 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @EntityGraph(attributePaths = "items")
     @Query("select o from Order o where exists (select 1 from OrderItem i where i.order = o and i.storeId = :storeId)")
     List<Order> findAllByStoreId(@Param("storeId") UUID storeId);
+
+    // Encomendas num estado desde antes de um instante (ex: à espera de pagamento há mais de 15 minutos)
+    List<Order> findAllByStatusAndAwaitingPaymentSinceBefore(OrderStatus status, Instant cutoff);
 }

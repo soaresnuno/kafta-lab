@@ -1,7 +1,6 @@
 package com.nuno.kafkalab.orderservice.responses;
 
 import com.nuno.kafkalab.orderservice.entities.Order;
-import com.nuno.kafkalab.orderservice.entities.OrderItem;
 import com.nuno.kafkalab.orderservice.entities.OrderStatus;
 
 import java.math.BigDecimal;
@@ -22,19 +21,8 @@ public record OrderResponse(
                 order.getUserId(),
                 order.getStatus(),
                 order.getRejectionReason(),
-                totalOf(order.getItems()),
+                order.getTotal(),
                 order.getItems().stream().map(OrderItemResponse::from).toList()
         );
-    }
-
-    // Só há total quando todos os items têm preço, ou seja, depois de o stock ser confirmado.
-    // Package-private para o StoreOrderResponse usar a mesma regra
-    static BigDecimal totalOf(List<OrderItem> items) {
-        if (items.stream().anyMatch(item -> item.getUnitPrice() == null)) {
-            return null;
-        }
-        return items.stream()
-                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

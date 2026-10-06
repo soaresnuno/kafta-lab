@@ -1,14 +1,19 @@
 package com.nuno.kafkalab.orderservice.services;
 
 import com.nuno.kafkalab.orderservice.config.KafkaConfig;
+import com.nuno.kafkalab.orderservice.config.OrderProperties;
 import com.nuno.kafkalab.orderservice.dtos.CreateOrderItemRequest;
 import com.nuno.kafkalab.orderservice.dtos.CreateOrderRequest;
 import com.nuno.kafkalab.orderservice.entities.Order;
 import com.nuno.kafkalab.orderservice.entities.OrderItem;
 import com.nuno.kafkalab.orderservice.entities.OrderStatus;
 import com.nuno.kafkalab.orderservice.entities.StoreReplica;
+import com.nuno.kafkalab.orderservice.events.CancelPaymentCommand;
 import com.nuno.kafkalab.orderservice.events.OrderCancelledEvent;
 import com.nuno.kafkalab.orderservice.events.OrderCreatedEvent;
+import com.nuno.kafkalab.orderservice.events.PaymentFailedEvent;
+import com.nuno.kafkalab.orderservice.events.PaymentSucceededEvent;
+import com.nuno.kafkalab.orderservice.events.RequestPaymentCommand;
 import com.nuno.kafkalab.orderservice.events.StockRejectedEvent;
 import com.nuno.kafkalab.orderservice.events.StockReservedEvent;
 import com.nuno.kafkalab.orderservice.exceptions.InvalidOrderStatusException;
@@ -19,15 +24,17 @@ import com.nuno.kafkalab.orderservice.messaging.EventPublisher;
 import com.nuno.kafkalab.orderservice.repositories.OrderRepository;
 import com.nuno.kafkalab.orderservice.repositories.StoreReplicaRepository;
 import com.nuno.kafkalab.orderservice.responses.OrderResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +42,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -56,8 +64,14 @@ class OrderServiceTest {
     private StoreReplicaRepository storeRepository;
     @Mock
     private EventPublisher eventPublisher;
-    @InjectMocks
+
     private OrderService service;
+
+    @BeforeEach
+    void setUp() {
+        service = new OrderService(orderRepository, storeRepository, eventPublisher,
+                new OrderProperties("EUR", Duration.ofMinutes(15)));
+    }
 
     @Test
     void createSavesPendingOrderOfTheUserAndPublishesOrderCreated() {
@@ -79,42 +93,80 @@ class OrderServiceTest {
     }
 
     @Test
-    void confirmSetsTheStoreAndPriceOfEachItem() {
+    void stockReservedSetsPricesAndRequestsThePayment() {
         Order order = order(OrderStatus.PENDING);
         when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
 
-        service.confirm(stockReserved());
+        service.stockReserved(stockReserved());
 
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.AWAITING_PAYMENT);
+        assertThat(order.getAwaitingPaymentSince()).isNotNull();
         OrderItem item = order.getItems().getFirst();
         assertThat(item.getStoreId()).isEqualTo(STORE_ID);
         assertThat(item.getUnitPrice()).isEqualByComparingTo("100.00");
+        verify(eventPublisher).publish(KafkaConfig.PAYMENT_COMMANDS, ORDER_ID, RequestPaymentCommand.TYPE,
+                new RequestPaymentCommand(ORDER_ID, CAROL, new BigDecimal("200.00"), "EUR"));
     }
 
     @Test
-    void confirmIgnoresOrderThatIsNoLongerPending() {
+    void stockReservedIsIgnoredWhenTheOrderIsNoLongerPending() {
         Order order = order(OrderStatus.CANCELLED);
         when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
 
-        service.confirm(stockReserved());
+        service.stockReserved(stockReserved());
 
         assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED);
         assertThat(order.getItems().getFirst().getUnitPrice()).isNull();
+        verifyNoInteractions(eventPublisher);
     }
 
     @Test
-    void rejectStoresTheReason() {
+    void stockRejectedStoresTheReason() {
         Order order = order(OrderStatus.PENDING);
         when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
 
-        service.reject(new StockRejectedEvent(ORDER_ID, "Insufficient stock"));
+        service.stockRejected(new StockRejectedEvent(ORDER_ID, "Insufficient stock"));
 
         assertThat(order.getStatus()).isEqualTo(OrderStatus.REJECTED);
         assertThat(order.getRejectionReason()).isEqualTo("Insufficient stock");
     }
 
     @Test
-    void cancelConfirmedOrderPublishesOrderCancelled() {
+    void paymentSucceededConfirmsTheOrder() {
+        Order order = order(OrderStatus.AWAITING_PAYMENT);
+        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
+
+        service.paymentSucceeded(new PaymentSucceededEvent(ORDER_ID, UUID.randomUUID()));
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+    }
+
+    @Test
+    void paymentSucceededIsIgnoredWhenTheOrderWasCancelled() {
+        Order order = order(OrderStatus.CANCELLED);
+        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
+
+        service.paymentSucceeded(new PaymentSucceededEvent(ORDER_ID, UUID.randomUUID()));
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+    }
+
+    @Test
+    void paymentFailedReleasesTheStock() {
+        Order order = order(OrderStatus.AWAITING_PAYMENT);
+        when(orderRepository.findById(ORDER_ID)).thenReturn(Optional.of(order));
+
+        service.paymentFailed(new PaymentFailedEvent(ORDER_ID, "Card declined"));
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PAYMENT_FAILED);
+        assertThat(order.getRejectionReason()).isEqualTo("Card declined");
+        verify(eventPublisher).publish(KafkaConfig.ORDER_EVENTS, ORDER_ID, OrderCancelledEvent.TYPE,
+                new OrderCancelledEvent(ORDER_ID));
+        verify(eventPublisher, never()).publish(eq(KafkaConfig.PAYMENT_COMMANDS), any(), any(), any());
+    }
+
+    @Test
+    void cancellingAPaidOrderReleasesTheStockAndCancelsThePayment() {
         when(orderRepository.findByIdAndUserId(ORDER_ID, CAROL)).thenReturn(Optional.of(order(OrderStatus.CONFIRMED)));
 
         OrderResponse response = service.cancel(ORDER_ID, CAROL);
@@ -122,16 +174,46 @@ class OrderServiceTest {
         assertThat(response.status()).isEqualTo(OrderStatus.CANCELLED);
         verify(eventPublisher).publish(KafkaConfig.ORDER_EVENTS, ORDER_ID, OrderCancelledEvent.TYPE,
                 new OrderCancelledEvent(ORDER_ID));
+        verify(eventPublisher).publish(KafkaConfig.PAYMENT_COMMANDS, ORDER_ID, CancelPaymentCommand.TYPE,
+                new CancelPaymentCommand(ORDER_ID));
+    }
+
+    @Test
+    void cancellingAPendingOrderDoesNotTouchThePayment() {
+        when(orderRepository.findByIdAndUserId(ORDER_ID, CAROL)).thenReturn(Optional.of(order(OrderStatus.PENDING)));
+
+        service.cancel(ORDER_ID, CAROL);
+
+        verify(eventPublisher).publish(KafkaConfig.ORDER_EVENTS, ORDER_ID, OrderCancelledEvent.TYPE,
+                new OrderCancelledEvent(ORDER_ID));
+        verify(eventPublisher, never()).publish(eq(KafkaConfig.PAYMENT_COMMANDS), any(), any(), any());
     }
 
     @ParameterizedTest
-    @EnumSource(value = OrderStatus.class, names = {"REJECTED", "CANCELLED"})
+    @EnumSource(value = OrderStatus.class, names = {"REJECTED", "PAYMENT_FAILED", "CANCELLED"})
     void finishedOrderCannotBeCancelled(OrderStatus status) {
         when(orderRepository.findByIdAndUserId(ORDER_ID, CAROL)).thenReturn(Optional.of(order(status)));
 
         assertThatThrownBy(() -> service.cancel(ORDER_ID, CAROL))
                 .isInstanceOf(InvalidOrderStatusException.class);
         verifyNoInteractions(eventPublisher);
+    }
+
+    @Test
+    void unpaidOrdersAreCancelledAfterTheTimeout() {
+        Order unpaid = order(OrderStatus.AWAITING_PAYMENT);
+        unpaid.setAwaitingPaymentSince(Instant.now().minus(Duration.ofMinutes(20)));
+        when(orderRepository.findAllByStatusAndAwaitingPaymentSinceBefore(eq(OrderStatus.AWAITING_PAYMENT), any()))
+                .thenReturn(List.of(unpaid));
+
+        service.expireUnpaidOrders();
+
+        assertThat(unpaid.getStatus()).isEqualTo(OrderStatus.CANCELLED);
+        assertThat(unpaid.getRejectionReason()).isEqualTo("Payment not completed in time");
+        verify(eventPublisher).publish(KafkaConfig.ORDER_EVENTS, ORDER_ID, OrderCancelledEvent.TYPE,
+                new OrderCancelledEvent(ORDER_ID));
+        verify(eventPublisher).publish(KafkaConfig.PAYMENT_COMMANDS, ORDER_ID, CancelPaymentCommand.TYPE,
+                new CancelPaymentCommand(ORDER_ID));
     }
 
     @Test
