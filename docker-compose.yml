@@ -25,6 +25,19 @@ services:
       - products_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  stores-db:
+    image: postgres:15-alpine
+    container_name: stores-postgres
+    environment:
+      POSTGRES_DB: stores_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secretpassword
+    ports:
+      - "5434:5432"
+    volumes:
+      - stores_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   # Kafka em modo KRaft (sem Zookeeper): um único nó que é broker e controller ao mesmo tempo
   kafka:
     image: apache/kafka:4.1.1
@@ -68,3 +81,4 @@ services:
 volumes:
   orders_data:
   products_data:
+  stores_data:

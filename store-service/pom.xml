@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Aponta para o NOSSO parent -->
+    <parent>
+        <groupId>com.nuno.kafkalab</groupId>
+        <artifactId>kafka-lab-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- groupId e version são herdados do parent -->
+    <artifactId>store-service</artifactId>
+    <name>store-service</name>
+    <description>Stores service</description>
+
+    <!-- Só o que é específico deste serviço.
+         web, validation, JPA, kafka, actuator, lombok e test vêm do parent -->
+    <dependencies>
+        <!-- Driver do PostgreSQL para ligar à base de dados -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Gera o .jar executável; tem de estar no filho -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

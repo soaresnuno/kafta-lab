@@ -20,6 +20,7 @@
     <modules>
         <module>order-service</module>
         <module>product-service</module>
+        <module>store-service</module>
     </modules>
 
     <properties>
