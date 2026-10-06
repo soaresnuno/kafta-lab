@@ -2,6 +2,7 @@ package com.nuno.kafkalab.outbox;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -17,8 +18,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 // e o OutboxEventRepository serem encontrados sem configuração nos serviços.
 // Por isso tem de correr antes do JPA (o beforeName acima), que lê a lista quando arranca
 @AutoConfigurationPackage(basePackageClasses = OutboxEvent.class)
-// O OutboxRelay é um @Scheduled: sem isto nunca corria
+// Lê as propriedades outbox.* (intervalos, tamanho do lote, retenção)
+@EnableConfigurationProperties(OutboxProperties.class)
+// O OutboxScheduler agenda o relay: sem isto nunca corria
 @EnableScheduling
-@Import({EventPublisher.class, OutboxRelay.class})
+@Import({EventPublisher.class, OutboxRelay.class, OutboxScheduler.class})
 public class OutboxAutoConfiguration {
 }

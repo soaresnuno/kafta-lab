@@ -31,9 +31,31 @@ class OutboxEventRepositoryTest {
         save(event(Instant.now()));
         OutboxEvent second = save(event(null));
 
-        assertThat(outboxRepository.findTop100BySentAtIsNullOrderByIdAsc())
+        assertThat(outboxRepository.lockNextPending(10))
                 .extracting(OutboxEvent::getId)
                 .containsExactly(first.getId(), second.getId());
+    }
+
+    @Test
+    void lockNextPendingRespectsTheBatchSize() {
+        OutboxEvent first = save(event(null));
+        OutboxEvent second = save(event(null));
+        save(event(null));
+
+        assertThat(outboxRepository.lockNextPending(2))
+                .extracting(OutboxEvent::getId)
+                .containsExactly(first.getId(), second.getId());
+    }
+
+    @Test
+    void detectsAnEarlierPendingEventWithTheSameKey() {
+        OutboxEvent created = save(event(null, "order-1"));
+        OutboxEvent cancelled = save(event(null, "order-1"));
+        OutboxEvent otherOrder = save(event(null, "order-2"));
+
+        assertThat(outboxRepository.existsByMessageKeyAndSentAtIsNullAndIdLessThan("order-1", cancelled.getId())).isTrue();
+        assertThat(outboxRepository.existsByMessageKeyAndSentAtIsNullAndIdLessThan("order-1", created.getId())).isFalse();
+        assertThat(outboxRepository.existsByMessageKeyAndSentAtIsNullAndIdLessThan("order-2", otherOrder.getId())).isFalse();
     }
 
     @Test
@@ -56,10 +78,13 @@ class OutboxEventRepositoryTest {
     }
 
     private static OutboxEvent event(Instant sentAt) {
-        UUID orderId = UUID.randomUUID();
+        return event(sentAt, UUID.randomUUID().toString());
+    }
+
+    private static OutboxEvent event(Instant sentAt, String orderId) {
         OutboxEvent event = new OutboxEvent();
         event.setTopic("order-events");
-        event.setMessageKey(orderId.toString());
+        event.setMessageKey(orderId);
         event.setType("orderCreated");
         event.setPayload("{\"orderId\":\"" + orderId + "\"}");
         event.setCreatedAt(Instant.now());

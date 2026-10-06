@@ -4,16 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 // Envia para o Kafka os eventos gravados na tabela outbox_events (polling publisher).
-// Registado pela OutboxAutoConfiguration, que também liga o @Scheduled
+// Registado pela OutboxAutoConfiguration; o OutboxScheduler chama os métodos de tempos a tempos.
+// Pode correr em várias instâncias do mesmo serviço ao mesmo tempo (ver OutboxEventRepository.lockNextPending)
 @Slf4j
 @RequiredArgsConstructor
 public class OutboxRelay {
@@ -22,12 +21,19 @@ public class OutboxRelay {
 
     private final OutboxEventRepository outboxRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final OutboxProperties properties;
 
-    // fixedDelay: espera 500ms depois de a execução anterior ACABAR, por isso nunca correm duas ao mesmo tempo
-    @Scheduled(fixedDelay = 500)
     @Transactional
     public void publishPending() {
-        for (OutboxEvent event : outboxRepository.findTop100BySentAtIsNullOrderByIdAsc()) {
+        for (OutboxEvent event : outboxRepository.lockNextPending(properties.batchSize())) {
+            // Os eventos com a mesma key (ex: a mesma encomenda) têm de sair por ordem: orderCreated antes de
+            // orderCancelled. Se um anterior ainda está por enviar (bloqueado por outra instância), este fica
+            // para a próxima execução. Os enviados neste ciclo já contam como enviados: o Hibernate grava-os
+            // na BD antes desta query (flush automático)
+            if (outboxRepository.existsByMessageKeyAndSentAtIsNullAndIdLessThan(event.getMessageKey(), event.getId())) {
+                continue;
+            }
+
             ProducerRecord<String, String> record =
                     new ProducerRecord<>(event.getTopic(), event.getMessageKey(), event.getPayload());
             // O consumer usa este header para saber que record criar (ver spring.json.type.mapping)
@@ -52,13 +58,12 @@ public class OutboxRelay {
         }
     }
 
-    // Os eventos enviados ficam 7 dias na tabela (dá para os consultar na BD) e depois são apagados
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
+    // Os eventos enviados ficam na tabela durante outbox.retention (dá para os consultar na BD) e depois são apagados
     @Transactional
     public void deleteOldSentEvents() {
-        int deleted = outboxRepository.deleteSentBefore(Instant.now().minus(7, ChronoUnit.DAYS));
+        int deleted = outboxRepository.deleteSentBefore(Instant.now().minus(properties.retention()));
         if (deleted > 0) {
-            log.info("Deleted {} sent outbox events older than 7 days", deleted);
+            log.info("Deleted {} sent outbox events older than {}", deleted, properties.retention());
         }
     }
 }
