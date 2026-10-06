@@ -18,6 +18,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    // Loja dona do produto. Só o id: a loja em si vive no store-service
+    @Column(nullable = false)
+    private UUID storeId;
+
     @Column(nullable = false)
     private String name;
 
@@ -30,4 +34,9 @@ public class Product {
 
     @Column(nullable = false)
     private Integer stock;
+
+    // Soft delete: um produto "apagado" fica inativo, porque encomendas antigas apontam para ele.
+    // Inativo = fora do catálogo e não pode ser encomendado
+    @Column(nullable = false)
+    private boolean active = true;
 }

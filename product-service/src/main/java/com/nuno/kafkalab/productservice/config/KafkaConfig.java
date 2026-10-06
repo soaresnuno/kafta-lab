@@ -10,6 +10,7 @@ public class KafkaConfig {
 
     public static final String ORDER_EVENTS = "order-events";
     public static final String STOCK_EVENTS = "stock-events";
+    public static final String STORE_EVENTS = "store-events";
 
     // Cada serviço cria o tópico onde escreve. O Spring Boot (KafkaAdmin) cria-o no arranque se não existir.
     // 3 partições: a key (orderId) decide a partição, por isso os eventos da mesma encomenda ficam por ordem

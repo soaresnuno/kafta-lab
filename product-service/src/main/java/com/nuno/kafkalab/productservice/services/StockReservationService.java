@@ -67,7 +67,7 @@ public class StockReservationService {
             Product product = products.get(productId);
             product.setStock(product.getStock() - quantity);
             reservation.getItems().add(new ReservedItem(productId, quantity));
-            reservedItems.add(new StockReservedEvent.Item(productId, product.getPrice()));
+            reservedItems.add(new StockReservedEvent.Item(productId, product.getStoreId(), product.getPrice()));
         });
         reservation.setStatus(ReservationStatus.RESERVED);
         reservationRepository.save(reservation);
@@ -108,12 +108,15 @@ public class StockReservationService {
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
     }
 
-    // Devolve o motivo da rejeição, ou null se todos os produtos existem e têm stock
+    // Devolve o motivo da rejeição, ou null se todos os produtos existem, estão ativos e têm stock
     private String findRejectionReason(Map<UUID, Integer> requested, Map<UUID, Product> products) {
         for (var entry : requested.entrySet()) {
             Product product = products.get(entry.getKey());
             if (product == null) {
                 return "Product " + entry.getKey() + " not found";
+            }
+            if (!product.isActive()) {
+                return "Product " + entry.getKey() + " is no longer available";
             }
             if (product.getStock() < entry.getValue()) {
                 return "Insufficient stock for product " + entry.getKey()

@@ -16,4 +16,19 @@ public class GlobalExceptionHandler {
         problem.setTitle("Product not found");
         return problem;
     }
+
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ProblemDetail handleStoreNotFound(StoreNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setTitle("Store not found");
+        return problem;
+    }
+
+    @ExceptionHandler(StoreInactiveException.class)
+    public ProblemDetail handleStoreInactive(StoreInactiveException ex) {
+        // 409 Conflict: o pedido é válido, mas a loja já não pode receber produtos novos
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        problem.setTitle("Store inactive");
+        return problem;
+    }
 }
