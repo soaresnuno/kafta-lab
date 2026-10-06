@@ -8,6 +8,7 @@ import java.util.UUID;
 public record OrderItemResponse(
         UUID id,
         UUID productId,
+        UUID storeId,
         Integer quantity,
         BigDecimal unitPrice
 ) {
@@ -15,6 +16,7 @@ public record OrderItemResponse(
         return new OrderItemResponse(
                 item.getId(),
                 item.getProductId(),
+                item.getStoreId(),
                 item.getQuantity(),
                 item.getUnitPrice()
         );

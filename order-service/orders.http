@@ -1,5 +1,17 @@
-### 1. Criar um produto no product-service com stock 5 (guarda o id em productId)
-POST http://localhost:8081/products
+### 0. Criar uma loja no store-service (guarda o id em storeId)
+POST http://localhost:8082/stores
+Content-Type: application/json
+
+{
+  "name": "Keyboard Shop",
+  "email": "hello@keyboardshop.com"
+}
+
+> {% client.global.set("storeId", response.body.id); %}
+
+### 1. Criar um produto da loja com stock 5 (guarda o id em productId)
+# Se der 404 "Store not found", o evento storeCreated ainda não chegou: repete daqui a um instante
+POST http://localhost:8081/stores/{{storeId}}/products
 Content-Type: application/json
 
 {
@@ -24,8 +36,11 @@ Content-Type: application/json
 
 > {% client.global.set("orderId", response.body.id); %}
 
-### 2b. Um instante depois -> CONFIRMED, com unitPrice e total
+### 2b. Um instante depois -> CONFIRMED, com storeId, unitPrice e total
 GET http://localhost:8080/orders/{{orderId}}
+
+### 2c. A loja vê a encomenda (só os seus items)
+GET http://localhost:8080/stores/{{storeId}}/orders
 
 ### 3. O stock do produto desceu para 3
 GET http://localhost:8081/products/{{productId}}

@@ -14,16 +14,17 @@ import com.nuno.kafkalab.orderservice.exceptions.OrderNotFoundException;
 import com.nuno.kafkalab.orderservice.messaging.EventPublisher;
 import com.nuno.kafkalab.orderservice.repositories.OrderRepository;
 import com.nuno.kafkalab.orderservice.responses.OrderResponse;
+import com.nuno.kafkalab.orderservice.responses.StoreOrderResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,6 +73,14 @@ public class OrderService {
         return OrderResponse.from(findOrThrow(id));
     }
 
+    // Encomendas com items desta loja. Cada loja só vê os seus items
+    @Transactional(readOnly = true)
+    public List<StoreOrderResponse> getByStore(UUID storeId) {
+        return orderRepository.findAllByStoreId(storeId).stream()
+                .map(order -> StoreOrderResponse.from(order, storeId))
+                .toList();
+    }
+
     // Em vez de apagar, cancela: fica o histórico e o product-service devolve o stock
     @Transactional
     public OrderResponse cancel(UUID id) {
@@ -96,10 +105,12 @@ public class OrderService {
         }
 
         Order order = pending.get();
-        Map<UUID, BigDecimal> prices = event.items().stream()
-                .collect(Collectors.toMap(StockReservedEvent.Item::productId, StockReservedEvent.Item::unitPrice));
+        Map<UUID, StockReservedEvent.Item> reserved = event.items().stream()
+                .collect(Collectors.toMap(StockReservedEvent.Item::productId, Function.identity()));
         for (OrderItem item : order.getItems()) {
-            item.setUnitPrice(prices.get(item.getProductId()));
+            StockReservedEvent.Item reservedItem = reserved.get(item.getProductId());
+            item.setStoreId(reservedItem.storeId());
+            item.setUnitPrice(reservedItem.unitPrice());
         }
         order.setStatus(OrderStatus.CONFIRMED);
         log.info("Order {} confirmed", order.getId());

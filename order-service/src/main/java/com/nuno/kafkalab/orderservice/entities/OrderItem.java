@@ -24,8 +24,10 @@ public class OrderItem {
     @Column(nullable = false)
     private Integer quantity;
 
-    // Preço no momento da compra, enviado pelo product-service quando confirma o stock.
-    // Fica null enquanto a encomenda está PENDING
+    // Loja e preço no momento da compra, enviados pelo product-service quando confirma o stock.
+    // Ficam null enquanto a encomenda está PENDING
+    private UUID storeId;
+
     @Column(precision = 10, scale = 2)
     private BigDecimal unitPrice;
 

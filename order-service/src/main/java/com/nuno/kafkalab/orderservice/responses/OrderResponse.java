@@ -27,8 +27,9 @@ public record OrderResponse(
         );
     }
 
-    // Só há total quando todos os items têm preço, ou seja, depois de o stock ser confirmado
-    private static BigDecimal totalOf(List<OrderItem> items) {
+    // Só há total quando todos os items têm preço, ou seja, depois de o stock ser confirmado.
+    // Package-private para o StoreOrderResponse usar a mesma regra
+    static BigDecimal totalOf(List<OrderItem> items) {
         if (items.stream().anyMatch(item -> item.getUnitPrice() == null)) {
             return null;
         }
