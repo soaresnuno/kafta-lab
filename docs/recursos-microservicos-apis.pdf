@@ -1,0 +1,349 @@
+%PDF-1.4
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R /F3 18 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://microservices.io/patterns/microservices.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 665.3036 266.9289 679.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+5 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://martinfowler.com/articles/microservices.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 637.3036 266.9204 651.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+6 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://microservices.io/patterns/data/database-per-service.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 609.3036 313.7214 623.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+7 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://learn.microsoft.com/en-us/azure/architecture/patterns/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 581.3036 303.8104 595.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+8 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://microservices.io/patterns/data/saga.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 519.3036 252.3174 533.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+9 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://learn.microsoft.com/en-us/azure/architecture/patterns/saga)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 505.3036 322.2384 519.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+10 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://microservices.io/patterns/data/transactional-outbox.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 477.3036 310.4234 491.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+11 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://debezium.io/blog/2019/02/19/reliable-microservices-data-exchange-with-the-outbox-pattern/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 449.3036 445.5394 463.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+12 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://microservices.io/patterns/communication-style/idempotent-consumer.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 421.3036 377.0039 435.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+13 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://martinfowler.com/articles/201701-event-driven.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 393.3036 292.9304 407.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+14 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://www.enterpriseintegrationpatterns.com/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 365.3036 249.9544 379.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+15 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://developer.confluent.io/courses/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 303.3036 217.8499 317.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+16 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://kafka.apache.org/documentation/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 275.3036 225.8909 289.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+17 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://docs.spring.io/spring-kafka/reference/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 247.3036 241.9304 261.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+18 0 obj
+<<
+/BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding /Name /F3 /Subtype /Type1 /Type /Font
+>>
+endobj
+19 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://oauth.net/2/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 171.3036 145.1069 185.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+20 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://jwt.io/introduction)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 143.3036 165.8724 157.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+21 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 115.3036 397.3274 129.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+22 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://www.keycloak.org/documentation)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 87.30364 226.8089 101.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+23 0 obj
+<<
+/Annots [ 4 0 R 5 0 R 6 0 R 7 0 R 8 0 R 9 0 R 10 0 R 11 0 R 12 0 R 13 0 R 
+  14 0 R 15 0 R 16 0 R 17 0 R 19 0 R 20 0 R 21 0 R 22 0 R ] /Contents 41 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 40 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 
+  /Trans <<
+
+>> /Type /Page
+>>
+endobj
+24 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://docs.stripe.com/api/idempotent_requests)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 739.3036 255.1649 753.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+25 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://stripe.com/blog/idempotency)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 711.3036 208.3894 725.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+26 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 649.3036 365.2144 663.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+27 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://opensource.zalando.com/restful-api-guidelines/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 621.3036 278.3104 635.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+28 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://google.aip.dev/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 593.3036 157.8569 607.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+29 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://github.com/microsoft/api-guidelines)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 565.3036 233.4219 579.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+30 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://www.rfc-editor.org/rfc/rfc9457)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 537.3036 211.6789 551.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+31 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://www.rfc-editor.org/rfc/rfc9110)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 509.3036 211.6789 523.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+32 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://owasp.org/API-Security/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 481.3036 191.3809 495.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+33 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://swagger.io/specification/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 453.3036 192.8004 467.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+34 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://springdoc.org/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 439.3036 154.0659 453.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+35 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://12factor.net/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 411.3036 147.4614 425.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+36 0 obj
+<<
+/A <<
+/S /URI /Type /Action /URI (https://testcontainers.com/guides/)
+>> /Border [ 0 0 0 ] /Rect [ 74.69291 349.3036 201.3089 363.3036 ] /Subtype /Link /Type /Annot
+>>
+endobj
+37 0 obj
+<<
+/Annots [ 24 0 R 25 0 R 26 0 R 27 0 R 28 0 R 29 0 R 30 0 R 31 0 R 32 0 R 33 0 R 
+  34 0 R 35 0 R 36 0 R ] /Contents 42 0 R /MediaBox [ 0 0 595.2756 841.8898 ] /Parent 40 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 
+  /Trans <<
+
+>> /Type /Page
+>>
+endobj
+38 0 obj
+<<
+/PageMode /UseNone /Pages 40 0 R /Type /Catalog
+>>
+endobj
+39 0 obj
+<<
+/Author (\(anonymous\)) /CreationDate (D:20261006235712+00'00') /Creator (\(unspecified\)) /Keywords () /ModDate (D:20261006235712+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (\(unspecified\)) /Title (Microservi\347os e APIs: recursos) /Trapped /False
+>>
+endobj
+40 0 obj
+<<
+/Count 2 /Kids [ 23 0 R 37 0 R ] /Type /Pages
+>>
+endobj
+41 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 2182
+>>
+stream
+GauHNhfIL2&:X(TZ#`_5-4!9D"b"QOD5Z"O[+@'S06pE2!G[Q^,ro].YJ6>V?m'/WYV44NZ*8GerH;8SlVIlV7K%SA"ScI6UULpcKBWeX6mA#t"`L7klLSM0H:!ek/;XHi8LPR-lFFNWf(Y2WPQX:865Yi8`b>k1,n)tELCp*#Oop+=dr-r=h;.VuMp56.,KYU5.&9^*`X1KZ>N0\]QhLXd^`n!Kd9?f+E%3X*1lUq8BKTo%K4tgJ9DuPe<nL#ca9?sUR8uf@4,KE%b(,",'K>Ma43akNn2M4'h&(_\a.#/=IW%+P6UhqbBf&tr+bmc%oahTK2/nZ(s2![W&[F8JUr3A1*Z,>"&gnW\K.eFLZr'S(&B7b]Je^e;pn?4s@27Sgfe"9]r+<#&r[f2C)W.#f;b#eX!edg8MNRB^AMN'&;!T\R2"Fh2S^mm8NfAKN\<@,X6NqP)H#`egi=1k4PjU*uY[]l`-&HiYCRV,I13O<"^;gl#56-]>\F9J]/K8sh=De.O_@W]ZU`Fpe"T3S>V1C9T>B$,P<F3Ff"W=eplO#LNN^YO3!o5PBAL>*sY'>uaP?=2Bc*L>4$2,dJA$`%iUd=?V!fcg(d[,/28r&X!+U0Hk73>oGZ8kdtf6rk$,i3e1fH&7Pq[=7kY0<rokg1`Q't76-dN#>>m'::jJ!BS"Im_(eoRGrUaqER2qa0KSq!DQ)hf":qn-VP4?%A_`L#_&-RAgr1LTC`8)'1u6@LmkKEKa'J8+(_)LhBUZa*gnAODl,W=5<?cDD3DkL)SYuYo1kJlk1=@Ylm0dEU_Rh8EW*:D5'%H]&fB7',%P>3F"cec8jUu^H%BC1siK+=\IW38^K9^9aR`fIedoY"^L>/JOMt=h3Z`fZnBRHg"?t,'roE;4lQZ/5l=_!=BOJcNB^?7a<dHo^>pmD+AS,\rI@TJV<>dE+h0/Hg)JPcqQLdtYVIHkCkX<GB<.Sa[.&Yql)a#T"?u;,WJh3G.(>I=$Y<GtWMh9)Yl]+S/nbgdQ-X^`c_2@l&B$sL(A4"[%-%,+`n5hM3\GSXP`e"`s7``O^Z';"NR>9)g8?CY1iJn!?5fD<WCgL4Vomkp+&<OeV&e/C/<!.=#5rhFD;lNbO0dsI(<(\LPGX#^kZ\])fT<;F*ADXe=5l^I/$%bb)RH"(W8gPbVAS,dEX%kUXhLS##2?0j6cl*RNUU536LpU4%/1#L3g,9X#I\:,>R^(t>n$*ee3jg_?YH^(7:G)m9N/fBAA?I0Eht><0CW/1VHO>_JmR/N#ndH$KTu0BWL.do<J`?p_K9JXcU*TO(A';]6+;j.JFuWJ^n+\q^:A<8E\6hQJHjT=SVq)3n]8jQ4XG.#[-9ckn[RWGN-uKMqropl[*sO87Dg6"q$h\C.#!!]V,K_RNU&<">%6+Y*Y5M_E%[,MmFp#nE7jtK.#eO+kSYAshqo*P`?f`42Y$*iD8BEnFOhmo"?s=MBa^oImqg@8E*>08Cd'@!Qe/Dp%LTVD'DqcJ@Qc>e2QrqL;cjPNImGa'-PZ?U.\4\%IXsF5EaIbaHH!7j"PBO1]Kr<Sco=1d&?*j)Y#Ut4D&=/-1nm]Gb/SkmLo,jSEl=6cE&T:!GJg<N1gS@:-F"','jRnd[Lc5ZpJ-XRlZ<_;67:gV;s0cZ&FNC,V<=V$"4sB.2Uo]oG>1d<-hd%s!\q&o8tX7)eFaA48^H1\OV^BD#NT?0I5LTgNVk"1;.cO3?bOcj(i))0V+1jc',:"4/#]dh\B1bB[9#%N!jBO9QI97@!UhM++&.M6;oVj2mN0r!%Cn;G<F1H#N#Bc<B:,#k*-4':1=Ea20l6GBH.mZ<+ShV8.n0Xo.p"K9.D8A,f7Q<fR9mZV>["?>p`P#tL#TRY*o>:ahd')X_MKkK_ZPi#B_LPfO>B,%I6&'VdW&cM.6'YbSfNWE,7m`[4(9eYNQ-Cu1JJ0'2QEV(.^+#u`tb99[GW=s\,r)V/s]8XaH#0GIDmA]M#@1L"ZNOOWe7V?53oA\Y-79N&#B/L!FLM"<MR?.qG(`(Lgrg'r\O%*?HBdA:p<Qsl;j,lQA:OHg6A(kG$MA,$jd3c)0%mR(Rj&YNU>(9/ML(NbVEF*gX&/F'A@e-]-_^,:-qg-Y0rPRR]C7JLuVee5:Ts2VL-OUH?<&Z1.(4Cs5DlSg=mP+EJ]!l#[[E6<FFr/~>endstream
+endobj
+42 0 obj
+<<
+/Filter [ /ASCII85Decode /FlateDecode ] /Length 1992
+>>
+stream
+Gau0E>Ar4d'RnB339nD=m)%\mTb!EO2E/&"Z2prQ$>DBMK:-$"j36/LmB>D'k2mp70uOh7&Dtd'mlQkS%ON%f1<]D7!B?]:s3_&!K#o!+LH%!`!Z.&ap$mSs4=&e[-uf];kaCr8;b$TfF8]q,n;1Ru51g?"9\4JsP!EY:[2h'_.0]#O-NCsDGQ#IlPKdC)7D,<O1r8oK1@Xe46%Z"kBpl+_"CbNJj.]-"[p3S@aJ8is2U]@Id#$29JR3B;,qu&*9j!hl"UoXsP"aq8gU5I[;d]p%NG_^,6%@j/hkHXWG#A.A1!3]A0?YkoT:3Lo^rFZOn*I;upWV*0:)YXs8ghZij;I:#c,r'='lM]1_,UEH@lq"f;AJRVZ"oS\Dn(FNV&/^XWS=J;<%j4j2DUgGncj)]CNCVQnO"C'ii]pZ"SLBK)iHi)eGF\Z'S.I.oSE\pl-kUcq:;s'jD1pc34"RP3NH7AL,1fM7F[$8T:"V8b0pWlQk_(URYHnq(@iTGZ^@"D$;6sD@#IGBo3DfK%Bj2`D&XSa\]<0'@<RC^pF?`e:9!D8<uX7'kCP2%=]_Jj#PpNI'EXEV+q$#=ecsH;]/EV?h!OWK"n=4d2YNg8Pm:281!dK$S^"N/&=1-:1JB"bSHe:<>Bs@pK(8r5pE1SenNocC==r@!M[_WP6bIdr?]RCsBt1TR6\Dniq=2iK1Fc=dCeuRuOJTWWp$&YHZ9FPiK'+]+ofj@hhA.;@LjCT@C;be]G3u843%QEUVD6X<!Oim*ah3GQTXZI*%qD4!MhIna\^89-0uGY\QSG4(%%%K*+NqP-AGU5#!KjWdM*_E*r)uB`L4Mb$&WWH[3SM?tYJIVT[EWj5_I7lT8r.025N!m1Upt&@$c,Ak9ILf0R!-bm7aoi<M*s+f-$!B,drUPI0e-HRP\27PpGI29IA^YJWYQ*)Bj7LYXPB/*09bE6%JP/735.7t"$7o3MHQ?LgM5JmQs)?aF1eq!F1``ukj@J%(cnhWe]EI_/V-\KV``g75j(H\1tN0ne<SKh[o+Ob(/-uX5*Z)?O:&LT`JheQ56@-Za%`bB35nSB8l+2V>3U<C3:MrhJE:fCj?2Y"MTpi#6:QD$=9!!eC63AB/ZYleNZd49N@nI3-6jA6KVmB4pGG`G:M)4GTt6n;RMQ;m.B3YiUB-pfU_LtQ3]V(7]i/^/@Dq;NL7Mc-,,o>90S[>j59#[+3]q"?+aO&#-6e)M>7[")!m+Gm+!Ca*U-d;8j:r<M2;LidW`M\"]/BI[n(CNhH%WpP"OiO6XJ?Xqk\]gfd;^21D.Q\SE$2uq!n!RZF9:cCWlCIFm<BGuV`2)/<-^S?5n+m+L'<ctjiTF:U3tLS7M1i;Mn[>9^ur5leU?S*.X0`+4X]fUG_Q)#?T(TBJQX35>Fu*[7o+aa$O2e@Msjg;&pKhTks!:r)OrWIh=3)VH\46[QtaggookX%2)qi[*9[)"-Fe]/,:i04#<'#;lnDN<&;V$cABL]OD$"H/%D1k%MeQVK0]*u_nct2>)hCo`f@a$UVUJXP$j_7>pKD9(VMA5e8Ac8)eohMRYjK+oe\XtmbC4''a5jq*9>QGH3Kr\@n_&VW$PXq,bC]t`Tb?U::c+nP&4Jbr5G%iq;?N1MgE!tBi@n5S;tNjBVnJQVB;snb9Gc0&h<FW`oTdRhVsl]Y=b\[Q6.,jCY-t9N+Vp1Um%<P?57/+e72e?SqV#B>[9[CE((S7I]\me.Tm@8B:W1VeA!*bP>/3H[4mg+R-L`Be,"slLGM=1J<%T*PrWU;r6iitukV.j()&t;?d^<1f%"<it6H&I6^0AhsY\t/<'NBY#NJBAhe/UZA5l-=!=Ni.sR+#!D'[)k8A3S[9L>L,[L$(XML$qSjA5GqY[FMS2h>Kg.Q`3q0HA$i.g\CbFV";+CVoii0\C8:&KNC-X"a13PG>dO@?6P$YB^?8^N35BqMc]??BWJ6Q*qo)BXNUQ3\So!]=Yn/EI,X.9%XD3g~>endstream
+endobj
+xref
+0 43
+0000000000 65535 f 
+0000000061 00000 n 
+0000000113 00000 n 
+0000000220 00000 n 
+0000000332 00000 n 
+0000000536 00000 n 
+0000000740 00000 n 
+0000000956 00000 n 
+0000001170 00000 n 
+0000001370 00000 n 
+0000001588 00000 n 
+0000001805 00000 n 
+0000002055 00000 n 
+0000002286 00000 n 
+0000002497 00000 n 
+0000002696 00000 n 
+0000002888 00000 n 
+0000003080 00000 n 
+0000003279 00000 n 
+0000003395 00000 n 
+0000003568 00000 n 
+0000003748 00000 n 
+0000003989 00000 n 
+0000004180 00000 n 
+0000004521 00000 n 
+0000004721 00000 n 
+0000004909 00000 n 
+0000005140 00000 n 
+0000005347 00000 n 
+0000005523 00000 n 
+0000005719 00000 n 
+0000005910 00000 n 
+0000006101 00000 n 
+0000006285 00000 n 
+0000006471 00000 n 
+0000006646 00000 n 
+0000006820 00000 n 
+0000007007 00000 n 
+0000007319 00000 n 
+0000007389 00000 n 
+0000007690 00000 n 
+0000007758 00000 n 
+0000010032 00000 n 
+trailer
+<<
+/ID 
+[<e2b7a6f9b8aaddb03e883bec33401f2b><e2b7a6f9b8aaddb03e883bec33401f2b>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 39 0 R
+/Root 38 0 R
+/Size 43
+>>
+startxref
+12116
+%%EOF
